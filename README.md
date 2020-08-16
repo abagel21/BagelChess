@@ -2,7 +2,7 @@
 BagelChess is a deep learning chess engine. Utilizing a combination of minimax with alpha beta pruning and a convolutional neural network, the engine seeks to select the most advantageous move from any given position.
 
 ## Planned Development
-Short term, my goal is to improve the model with more data, longer training (lower learning rate), and improved structure and hyper parameters. 
+Short term, my goal is to improve the model with more data, longer training (lower learning rate), and improved structure and hyper parameters. The minimax can also be improved by storing the tree, so the move tree doesn't have to be rebuilt and reevaluated at every turn.
 
 This was my first chess programming experience and one of my few machine learning projects so I wanted to start simple, but long term I plan to hopefully move on to a larger project (using either a better computer or aws infrastructure so more data and a more complex model can be used). I also plan to implement Monte Carlo Tree Search in the future, as well as possibly creating my own chess board representation. The primary goal, of course, is to improve the performance of the engine over time with continued research, debugging, and coding.
 
