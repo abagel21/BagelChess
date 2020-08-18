@@ -1,0 +1,9 @@
+3 CNN 2 Dense:
+3 Layer CNN with two dense layers
+688 MAE
+68.4% explained variance score
+
+Optimal Model:
+above with weight decay
+660 MAE
+71.7% explained variance

@@ -17,11 +17,12 @@ import datetime
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
    tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
+print("WAS POPPIN")
 # import preprocessed data
 # tf.debugging.set_log_device_placement(True)
-df = pd.read_csv("./util/compiled_chess_games_0.csv")
+df = pd.read_csv("./util/compiled_standard_june_2020.csv")
 print(len(df))
+print("HELLLLLLLLLLLLOOOOOOOOOOOOOOOOO")
 bithash = {
     "." : np.array([0,0,0,0,0,0]),
     "r" : np.array([0,0,0,1,0,0]),
@@ -63,22 +64,32 @@ from tensorflow.keras.optimizers import SGD, Adam, RMSprop
 from tensorflow.keras.regularizers import L1, L2
 from tensorflow.keras.metrics import MeanAbsoluteError
 from tensorflow.keras.initializers import GlorotUniform
+from tensorflow_addons.optimizers import AdamW
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose = 1, patience = 1000)
+early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose = 1, patience = 20)
 adamOpti = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False,
     name='Adam')
+decayedAdamOpti = AdamW(weight_decay = 0.0001, learning_rate = 0.01, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False, name='AdamW')
+sgdOpti = SGD(
+    learning_rate=0.0001, momentum=0.8, nesterov=False, name='SGD'
+) 
+rmsOpti = tf.keras.optimizers.RMSprop(
+    learning_rate=0.001, rho=0.9, momentum=0.8, epsilon=1e-07, centered=False,
+    name='RMSprop'
+)
 initializer = GlorotUniform()
 regularizerl2 = L2(l2 = 0.1)
 regularizerl1 = L1(l1 = 0.1)
-EPOCHS = 500
+EPOCHS = 3000
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D, BatchNormalization
 model = Sequential()
 #, kernel_regularizer=regularizerl2
-model.add(Conv2D(36, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
-model.add(Conv2D(36, (3, 3), activation='relu', padding='same', data_format="channels_last", kernel_regularizer=regularizerl2))
+model.add(Conv2D(64, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
+model.add(Conv2D(64, (3, 3), activation='relu', padding='same', data_format="channels_last", kernel_regularizer=regularizerl2))
+model.add(Conv2D(64, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.2))
@@ -87,9 +98,11 @@ model.add(Dropout(0.2))
 model.add(Flatten())
 model.add(Dense(64, activation = 'relu', kernel_initializer=initializer, kernel_regularizer=regularizerl2))
 model.add(Dropout(0.5))
+model.add(Dense(64, activation = 'relu', kernel_initializer=initializer, kernel_regularizer=regularizerl2))
+model.add(Dropout(0.5))
 model.add(Dense(1))
 # , metrics=[MeanAbsoluteError(name='mean_absolute_error', dtype=None)]
-model.compile(loss='mse', optimizer=adamOpti)
+model.compile(loss='mse', optimizer=decayedAdamOpti)
 
 # training
 # , callbacks=[early_stop]
@@ -106,5 +119,5 @@ print(explained_variance_score(y_test, pred))
 
 
 # saving
-# model_no = 3
-# model.save(f'saved_models/chess_model_{model_no}')
+model_no = "standard_june_1"
+model.save(f'saved_models/chess_model_{model_no}')

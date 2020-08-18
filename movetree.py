@@ -30,16 +30,14 @@ def fenToNPArray(x):
         x[n] = newTemp
     return np.array(x)
 class Node :
-    def __init__(self, board, model, color) :
+    def __init__(self, board, model, color, isLeaf) :
         # print("INIT CALLED")
         self.board = board
         # if(not board.turn) :  self.board = board.mirror()
-        print(board.fen())
-        print(color)
         x = np.stack(np.array(fenToNPArray(board.fen())))
         x = x.reshape(1,8,8,6)
         # predict the value of the board state with the CNN
         self.value = model.predict(x)[0]
-        print(self.value)
         # find all moves for White/Black (depending on color)
-        self.nextMoves = board.legal_moves
+        if(not isLeaf) : 
+            self.nextMoves = board.legal_moves

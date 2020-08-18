@@ -3,6 +3,11 @@
 
 var board = null
 var game = new Chess()
+$('#startPositionBtn').on('click', () => {
+    console.log("BUTTON CLICKED");
+    board.start;
+    game.reset();
+})
 
 function onDragStart(source, piece, position, orientation) {
     // do not pick up pieces if the game is over
@@ -20,12 +25,14 @@ async function fetchComputerMove() {
     res = await fetch(url).then(res => {
         return res.text()
     })
-    console.log(res)
     game.move(res)
     board.position(game.fen())
 }
 
 function onDrop(source, target) {
+    if (game.game_over()) {
+        alert("Game Over!")
+    }
     // see if the move is legal
     var move = game.move({
         from: source,

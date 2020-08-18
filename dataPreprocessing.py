@@ -46,6 +46,19 @@ def expandGame(board):
     y.pop()
     df = df.append({'board' : y, "FEN" : y.board_fen()}, ignore_index = True)
     expandGame(y)
+def expandWhiteGames(board):
+    global df
+    x = len(board.move_stack)
+    if(x < 2):
+        return None
+    if(not board.turn): 
+        y = board.copy()
+        y.pop()
+        expandWhiteGames(y)
+    y = board.copy()
+    y.pop()
+    df = df.append({'board' : y, "FEN" : y.board_fen()}, ignore_index = True)
+    expandWhiteGames(y)
 # evaluate a board with the stockfish library
 def evalGame(board):
     print(len(board.move_stack))
@@ -57,18 +70,29 @@ def evalGame(board):
     print(r)
     return r['value']
 # evaluate the board with the stockfish engine imported via python chess
+count = 0
 def evalBoard(board):
-    print(len(board.move_stack))
-    return engine.analyse(board, chess.engine.Limit(time=0.3))['score'].relative.__str__()
+    global count
+    print(count)
+    count += 1
+    k = engine.analyse(board, chess.engine.Limit(time=0.05))['score'].relative.__str__()
+    print(k)
+    return k
 # replace all scores involving forced mates with +/- 10000
 def replaceForcedMate(x):
     if x[0] == "#" :
-       if x[1] == "+" :
-           return +10000
-       else:
-           return -10000
+        if x[2] == '0' :
+            if x[1] == "+" :
+                return +5000
+            else :
+                return -5000
+        else : 
+            if x[1] == "+" :
+                return +10000
+            else:
+                return -10000
     else:
-       return x
+        return x
 bithash = {
     "." : np.array([0,0,0,0,0,0]),
     "r" : np.array([0,0,0,1,0,0]),
@@ -100,6 +124,23 @@ def fenToNPArray(x):
              newTemp.append(bithash[x[n][i][0]])
         x[n] = newTemp
     return np.array(x)
+def addEvalToDataFrame(r, i):
+    # evaluate every board with stockfish and add it to the Dataframe
+    r['stockfish_eval'] = r['board'].apply(lambda x : evalBoard(x))
+    # remove the boards
+    r = r.drop("board", axis=1)
+    r.to_csv(f"temp_{i}.csv")
+    # replace checkmating values
+    r['stockfish_eval'] = r['stockfish_eval'].apply(lambda x : replaceForcedMate(x))
+def reverseTurn(board):
+    board.turn = not board.turn
+    if(board.is_check()):
+        return board
+    else :
+        board.turn = not board.turn
+        return board
+        
+        
 # extract board pd.Series
 y = df['board']
 x= len(y)

@@ -8,12 +8,14 @@ from treesearch import minimaxRoot
 from movetree import Node
 import urllib.parse
 import tensorflow as tf
+import tensorflow_addons as tfa
+tf.keras.optimizers.AdamW = tfa.optimizers.AdamW
 
-DEPTH = 2
+DEPTH = 3
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
    tf.config.experimental.set_memory_growth(physical_devices[0], True)
-model = load_model('./saved_models/3.1368e6')
+model = load_model('./saved_models/optimal')
 PORT = 80
 
 app = Flask(__name__)
@@ -34,7 +36,7 @@ def move(fen, color):
     # need color of engine and FEN of current board
     board = chess.Board(fen)
     board.turn = color
-    node = Node(board, model, color)
+    node = Node(board, model, color, False)
     move = minimaxRoot(node, 0, DEPTH, False, model, not color)
     print(board.san(move))
     move = board.san(move)

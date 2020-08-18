@@ -14,10 +14,15 @@ import datetime
 # to a certain depth 
 # and then pass that tree to minimax to find the best move
 
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+if len(physical_devices) > 0:
+   tf.config.experimental.set_memory_growth(physical_devices[0], True)
+print("WAS POPPIN")
 # import preprocessed data
 # tf.debugging.set_log_device_placement(True)
-df = pd.read_csv("./util/compiled_chess_games_0.csv")
+df = pd.read_csv("./util/compiled_standard_june_2020.csv")
 print(len(df))
+print("HELLLLLLLLLLLLOOOOOOOOOOOOOOOOO")
 bithash = {
     "." : np.array([0,0,0,0,0,0]),
     "r" : np.array([0,0,0,1,0,0]),
@@ -55,28 +60,26 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 # takes in a board input and outputs a centipawn value
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 from tensorflow.keras.optimizers import Adam
-early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose = 1, patience = 50)
-adamOpti = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False,
-    name='Adam')
 from tensorflow.keras.optimizers import SGD, Adam, RMSprop
 from tensorflow.keras.regularizers import L1, L2
 from tensorflow.keras.metrics import MeanAbsoluteError
 from tensorflow.keras.initializers import GlorotUniform
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose = 1, patience = 100)
+early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose = 1, patience = 1000)
 adamOpti = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False,
     name='Adam')
 initializer = GlorotUniform()
 regularizerl2 = L2(l2 = 0.1)
 regularizerl1 = L1(l1 = 0.1)
-EPOCHS = 358
+EPOCHS = 500
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D, BatchNormalization
 model = Sequential()
-model.add(Conv2D(64, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
-model.add(Conv2D(64, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizerl2))
+#, kernel_regularizer=regularizerl2
+model.add(Conv2D(16, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
+model.add(Conv2D(32, (3, 3), activation='relu', padding='same', data_format="channels_last", kernel_regularizer=regularizerl2))
 model.add(BatchNormalization())
 model.add(MaxPooling2D((2,2)))
 model.add(Dropout(0.2))
@@ -104,5 +107,5 @@ print(explained_variance_score(y_test, pred))
 
 
 # saving
-model_no = 3
-model.save(f'saved_models/chess_model_{model_no}')
+# model_no = 3
+# model.save(f'saved_models/chess_model_{model_no}')
