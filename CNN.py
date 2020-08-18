@@ -70,7 +70,7 @@ tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram
 early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose = 1, patience = 20)
 adamOpti = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False,
     name='Adam')
-decayedAdamOpti = AdamW(weight_decay = 0.0001, learning_rate = 0.01, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False, name='AdamW')
+decayedAdamOpti = AdamW(weight_decay = 0.00001, learning_rate = 0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False, name='AdamW')
 sgdOpti = SGD(
     learning_rate=0.0001, momentum=0.8, nesterov=False, name='SGD'
 ) 
@@ -79,8 +79,7 @@ rmsOpti = tf.keras.optimizers.RMSprop(
     name='RMSprop'
 )
 initializer = GlorotUniform()
-regularizerl2 = L2(l2 = 0.1)
-regularizerl1 = L1(l1 = 0.1)
+regularizerl2 = L2(l2 = 0.01)
 EPOCHS = 3000
 
 from tensorflow.keras.models import Sequential
