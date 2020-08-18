@@ -18,18 +18,18 @@ As my first foray into chess programming and an early foray into machine learnin
 I obtained my data from the fics database, starting with a smaller sample of 5000 games, expanded to all positions that were present during the game to create an 800,000 sample dataframe. I then used stockfish to produce evaluations for every position, creating the validation data for supervised learning.
 
 After a lot of tweaking to avoid a severe overfitting problem, my best neural network model involved two 36 node convolutional layers with a L2 regularization, a max pooling layer, and batch normalization, followed by a fully connected relu layer with 50% dropout. The loss graph for the model looked like this: 
-![Old Data Graph](./model_graphs/oldData)
+![Old Data Graph](./model_graphs/oldData.png)
 Even at its best, the old data produced moves barely better than random, with very little connection to realistic chess play other than simple material evaluation. Overfitting was extremely severe.
 
 I decided that after tweaking the model structure and hyperparameters for weeks, the best option was to train a new, larger dataset. I extracted ten times the games, 50,000, from the fics database, all standard play at all levels in June 2020. I processed it (which took around a week and a half with my computer, considering the size of the final database) and produced a 3.7 million sample csv with stockfish labels.
 
 After trying my previous optimal model on the new data, the difference was stark-- rather than marginal declines over large numbers of epochs, the model immediately began substantively improving, producing a promising graph that was underfitting rather than overfitting.
-![New Data Graph](./model_graphs/newData)
+![New Data Graph](./model_graphs/newData.png)
 
 With much more room to experiment (although much longer training times) I begin again the process of tweaking the model. I experimented with different numbers of both densely connected and convolutional layers, different dropout areas, learning rates, nodes per layer, regularization parameters, and eventually, weight decay with the tensorflow addons.
 
 My final model was far, far better than my original, producing the following loss graph:
-![New Data Optimal Graph](./model_graphs/newDataOptimal)
+![New Data Optimal Graph](./model_graphs/newDataOptimal.png)
 
 Although move selection was slow, making games slow, I played several games against the engine. Although I'm not great at chess, I would estimate myself to be 900-1000 ELO. The engine is capable of beating me, although not super consistently. It clearly improves with greater depth (at the cost of move time). Its greatest vulnerabilities are its inability to see particularly far in the future (complex trades, multi-step checkmates against it) and the margin for error allowing unecessary hanging pawns. However, it is particularly good at targeting high value pieces like rooks and queens, and especially good at endgame checks and checkmates (although not pawn endgames).
 
