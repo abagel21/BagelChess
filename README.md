@@ -10,6 +10,7 @@ Long Term :
 - Train a larger dataset
 - Improve move selection with optimization of the move tree, or with Monte Carlo Tree Search
 - Build my own bitboard game representation and move generator
+- Convert to self play rather than existing data
 
 ## Construction
 As my first foray into chess programming and an early foray into machine learning, I sought to pick a structure that would be challenging to implement and require research but not be unnattainable. As such, I decided to work with minimax instead of a Monte Carlo Tree search, and a simpler goal for my neural network-- evaluating positions from a board representation without worrying about move probabilities, focused instead on pure centipawn rating.
