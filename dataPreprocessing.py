@@ -5,22 +5,14 @@ import chess.pgn
 import chess.engine
 import numpy as np
 import io
-engine = chess.engine.SimpleEngine.popen_uci("./stockfish-11-win/Windows/stockfish_20011801_x64")
-fishy = Stockfish('./stockfish-11-win/Windows/stockfish_20011801_x64')
+engine = chess.engine.SimpleEngine.popen_uci("./stockfish-11-win/Windows/stockfish_20011801_x64_modern")
+print(engine.ping)
+print("START OF DOCUMENT")
 
 # read the pgn of game data
-df = pd.read_csv('../chessEngine/ficsgamesdb_search_146961.csv')
-# extract the exact pgn data
-df['moveset'] = df['moveset'].apply(lambda x : x if x[:2] == "1." else None)
-df = df.dropna()
-df = df.reset_index()
-df = df.drop('index', axis=1)
-# create a board for each pgn
-df['board'] = df['moveset'].apply(lambda x : getBoard(x))
-df = df.dropna()
-df = df.drop("moveset", axis=1)
-# add the FEN of each board so board can be reproduced after being saved as csv
-df['FEN'] = df['board'].apply(lambda x : x.board_fen())
+df = pd.read_csv('../chessEngine/util/pgn_split_1.csv')
+df = df[int(len(df)/2):]
+myTemp = pd.DataFrame()
 
 # get the board from the PGN representation
 def getBoard(pgnPos) :
@@ -37,38 +29,34 @@ def getBoard(pgnPos) :
 def getFen(board):
     return board.board_fen()
 # traceback the moves for each game and append them to the dataframe
+counte = 0
 def expandGame(board):
-    global df
+    global x
+    global counte
+    global myTemp
+    print(counte)
+    counte = counte + 1
     x = len(board.move_stack)
     if(x < 2):
         return None
     y = board.copy()
     y.pop()
-    df = df.append({'board' : y, "FEN" : y.board_fen()}, ignore_index = True)
+    myTemp = myTemp.append({'board' : y, "FEN" : y.board_fen()}, ignore_index = True)
     expandGame(y)
 def expandWhiteGames(board):
     global df
-    x = len(board.move_stack)
+    global x
     if(x < 2):
         return None
     if(not board.turn): 
         y = board.copy()
         y.pop()
         expandWhiteGames(y)
+    x = len(board.move_stack)
     y = board.copy()
     y.pop()
     df = df.append({'board' : y, "FEN" : y.board_fen()}, ignore_index = True)
     expandWhiteGames(y)
-# evaluate a board with the stockfish library
-def evalGame(board):
-    print(len(board.move_stack))
-    fen = getFen(board)
-    print(fen)
-    fishy.set_fen_position(fen)
-    print(fishy.get_board_visual())
-    r = fishy.get_evaluation()
-    print(r)
-    return r['value']
 # evaluate the board with the stockfish engine imported via python chess
 count = 0
 def evalBoard(board):
@@ -140,22 +128,68 @@ def reverseTurn(board):
         board.turn = not board.turn
         return board
         
+# prep for multiprocessing
+from multiprocessing import  Pool
+from functools import partial
+import numpy as np
+
+def parallelize(data, func, num_of_processes=6):
+    data_split = np.array_split(data, num_of_processes)
+    print("PARALLELIZING")
+    if __name__ == "__main__" :
+        pool = Pool(num_of_processes)
+        data= pd.concat(pool.map(func, data_split))
+        print("FINISHED")
+        pool.close()
+        print("POOL CLOSED")
+        # pool.join()
+        # print("POOL JOINED")
+        return data
+
+def run_on_subset(func, data_subset):
+    print("RUNNING ON SUBSET")
+    print(len(data_subset))
+    data_subset.apply(func)
+    return myTemp
+
+def parallelize_on_rows(data, func, num_of_processes=6):
+    return parallelize(data, partial(run_on_subset, func), num_of_processes)
+
+# # extract the exact pgn data
+# df['[Event "FICS rated standard game"]'] = df['[Event "FICS rated standard game"]'].apply(lambda x : x if x[:2] == "1." else None)
+# df = df.dropna()
+# df = df.reset_index()
+# df = df.drop('index', axis=1)
+# dfArr = np.array_split(df, 12)
+# i = 0
+# for data in dfArr :
+#     data.to_csv(f"pgn_split_{i}.csv")
+#     i = i + 1
+# create a board for each pgn
+df['board'] = df['[Event "FICS rated standard game"]'].apply(lambda x : getBoard(x))
+df = df.dropna()
+df = df.drop('[Event "FICS rated standard game"]', axis=1)
+# add the FEN of each board so board can be reproduced after being saved as csv
+df['FEN'] = df['board'].apply(lambda x : x.board_fen())
         
-# extract board pd.Series
-y = df['board']
-x= len(y)
 # for each board, call recursive function expandGame, which
 # cascades through the previous moves and adds every position
 # from that game to the dataframe
-for i in range(x+1):
-    print(i)
-    expandGame(y[i])
-# evaluate every board with stockfish and add it to the Dataframe
-df['stockfish_eval'] = df['board'].apply(lambda x : evalBoard(x))
-# replace checkmating values
-df['stockfish_eval'] = df['stockfish_eval'].apply(lambda x : replaceForcedMate(x))
-# remove the boards
-df = df.drop("board", axis=1)
-# save the dataframe as a csv
-df.to_csv("compiled_chess_games.csv")
-df['FEN'] = df['FEN'].apply(lambda x : fenToNPArray(x))
+df = df.append(parallelize_on_rows(df['board'], expandGame), ignore_index = True)
+print("FINISHED PARALLELIZING")
+print(len(df))
+# df['board'] = df['board'].apply(lambda x : reverseTurn(x))
+df.drop("board", axis=1).to_csv("expanded_2020_1_2.csv", index=False)
+# extract board pd.Series
+# y = df['board']
+# x = len(y)
+# # evaluate every board with stockfish and add it to the Dataframe
+# df['stockfish_eval'] = df['board'].apply(lambda x : evalBoard(x))
+# df.to_csv("compiled_2020_mates.csv")
+# # replace checkmating values
+# df['stockfish_eval'] = df['stockfish_eval'].apply(lambda x : replaceForcedMate(x))
+# # remove the boards
+# df = df.drop("board", axis=1)
+# # save the dataframe as a csv
+# df.to_csv("compiled_2020_0.csv")
+# df['FEN'] = df['FEN'].apply(lambda x : fenToNPArray(x))

@@ -9,6 +9,8 @@ $('#startPositionBtn').on('click', () => {
     game.reset();
 })
 
+$('#selfBtn').on('click', selfPlay())
+
 function onDragStart(source, piece, position, orientation) {
     // do not pick up pieces if the game is over
     if (game.game_over()) return false
@@ -45,6 +47,21 @@ function onDrop(source, target) {
 
     // make random legal move for black
     window.setTimeout(fetchComputerMove, 500)
+}
+
+async function selfPlay() {
+    // while (!game.game_over()) {
+    //     let fen = game.fen()
+    //     fen = fen.replace(/\//g, "H")
+    //     fen = encodeURIComponent(fen)
+    //     url = `http://127.0.0.1:5000/move/${fen}/${game.turn()}`
+    //     res = await fetch(url).then(res => {
+    //         return res.text()
+    //     })
+    //     game.move(res)
+    //     board.position(game.fen())
+    // }
+    // alert("Game Over!")
 }
 
 // update the board position after the piece snap

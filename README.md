@@ -1,48 +1,109 @@
-# BagelChess
-BagelChess is a deep learning chess engine. Utilizing a combination of minimax with alpha beta pruning and a convolutional neural network, the engine seeks to select the most advantageous move from any given position.
+BagelChess
+==========
 
-## Planned Development
-Short Term :
-- Improve model structure and hyperparameters
-- Optimize current move selection strategy
+BagelChess is a deep learning chess engine. Utilizing a combination of minimax
+with alpha beta pruning and a convolutional neural network, the engine seeks to
+select the most advantageous move from any given position.
 
-Long Term :
-- Train a larger dataset
-- Improve move selection with optimization of the move tree, or with Monte Carlo Tree Search
-- Build my own bitboard game representation and move generator
-- Convert to self play rather than existing data
+Planned Development
+-------------------
 
-## Construction
-As my first foray into chess programming and an early foray into machine learning, I sought to pick a structure that would be challenging to implement and require research but not be unnattainable. As such, I decided to work with minimax instead of a Monte Carlo Tree search, and a simpler goal for my neural network-- evaluating positions from a board representation without worrying about move probabilities, focused instead on pure centipawn rating.
+Short Term : - Improve model structure and hyperparameters - Optimize current
+move selection strategy
 
-I obtained my data from the fics database, starting with a smaller sample of 5000 games, expanded to all positions that were present during the game to create an 800,000 sample dataframe. I then used stockfish to produce evaluations for every position, creating the validation data for supervised learning.
+Long Term : - Train a larger dataset - Improve move selection with optimization
+of the move tree, or with Monte Carlo Tree Search - Build my own bitboard game
+representation and move generator - Convert to self play rather than existing
+data
 
-After a lot of tweaking to avoid a severe overfitting problem, my best neural network model involved two 36 node convolutional layers with a L2 regularization, a max pooling layer, and batch normalization, followed by a fully connected relu layer with 50% dropout. The loss graph for the model looked like this: 
+Construction
+------------
+
+As my first foray into chess programming and an early foray into machine
+learning, I sought to pick a structure that would be challenging to implement
+and require research but not be unnattainable. As such, I decided to work with
+minimax instead of a Monte Carlo Tree search, and a simpler goal for my neural
+network-- evaluating positions from a board representation without worrying
+about move probabilities, focused instead on pure centipawn rating.
+
+I obtained my data from the fics database, starting with a smaller sample of
+5000 games, expanded to all positions that were present during the game to
+create an 800,000 sample dataframe. I then used stockfish to produce evaluations
+for every position, creating the validation data for supervised learning.
+
+After a lot of tweaking to avoid a severe overfitting problem, my best neural
+network model involved two 36 node convolutional layers with a L2
+regularization, a max pooling layer, and batch normalization, followed by a
+fully connected relu layer with 50% dropout. The loss graph for the model looked
+like this:
+
 ![Old Data Graph](./model_graphs/oldDataCrop.png)
-Even at its best, the old data produced moves barely better than random, with very little connection to realistic chess play other than simple material evaluation. Overfitting was extremely severe.
 
-I decided that after tweaking the model structure and hyperparameters for weeks, the best option was to train a new, larger dataset. I extracted ten times the games, 50,000, from the fics database, all standard play at all levels in June 2020. I processed it (which took around a week and a half with my computer, considering the size of the final database) and produced a 3.7 million sample csv with stockfish labels.
+Even at its best, the old data produced moves barely better than random, with
+very little connection to realistic chess play other than simple material
+evaluation. Overfitting was extremely severe.
 
-After trying my previous optimal model on the new data, the difference was stark-- rather than marginal declines over large numbers of epochs, the model immediately began substantively improving, producing a promising graph that was underfitting rather than overfitting.
+I decided that after tweaking the model structure and hyperparameters for weeks,
+the best option was to train a new, larger dataset. I extracted ten times the
+games, 50,000, from the fics database, all standard play at all levels in June
+2020. I processed it (which took around a week and a half with my computer,
+considering the size of the final database) and produced a 3.7 million sample
+csv with stockfish labels.
+
+After trying my previous optimal model on the new data, the difference was
+stark-- rather than marginal declines over large numbers of epochs, the model
+immediately began substantively improving, producing a promising graph that was
+underfitting rather than overfitting.
+
 ![New Data Graph](./model_graphs/newDataCrop.png)
 
-With much more room to experiment (although much longer training times) I begin again the process of tweaking the model. I experimented with different numbers of both densely connected and convolutional layers, different dropout areas, learning rates, nodes per layer, regularization parameters, and eventually, weight decay with the tensorflow addons.
+With much more room to experiment (although much longer training times) I begin
+again the process of tweaking the model. I experimented with different numbers
+of both densely connected and convolutional layers, different dropout areas,
+learning rates, nodes per layer, regularization parameters, and eventually,
+weight decay with the tensorflow addons.
 
-My final model was far, far better than my original, producing the following loss graph:
+My final model was far, far better than my original, producing the following
+loss graph:
+
 ![New Data Optimal Graph](./model_graphs/newDataOptimal.png)
 
-Although move selection was slow, making games slow, I played several games against the engine. Although I'm not great at chess, I would estimate myself to be 900-1000 ELO. The engine is capable of beating me, although not super consistently. It clearly improves with greater depth (at the cost of move time). Its greatest vulnerabilities are its inability to see particularly far in the future (complex trades, multi-step checkmates against it) and the margin for error allowing unecessary hanging pawns. However, it is particularly good at targeting high value pieces like rooks and queens, and especially good at endgame checks and checkmates (although not pawn endgames).
+Although move selection was slow, making games slow, I played several games
+against the engine. Although I'm not great at chess, I would estimate myself to
+be 1200-1500 ELO. It clearly improves with greater depth (at the cost of move
+time). Its greatest vulnerabilities are its inability to see particularly far in
+the future (complex trades, multi-step checkmates against it) and the margin for
+error allowing unecessary hanging pawns. However, it is particularly good at
+targeting high value pieces like rooks and queens, and especially good at
+endgame checks and checkmates (although not pawn endgames).
 
-I also constructed a website for the engine where it can be played against utilizing flask and two chess libraries--one for the board, one for the game--utilizing libraries because I had limited time and my focus was on the engine side.
+I also constructed a website for the engine where it can be played against
+utilizing flask and two chess libraries--one for the board, one for the
+game--utilizing libraries because I had limited time and my focus was on the
+engine side.
 
-## Dependencies
-- Python-Chess
-- Chess.js
-- Chessboard.js
-- Tensorflow
-- Keras
-- Numpy
-- Pandas
+Dependencies
+------------
 
-# Get Started
-Download the package and unzip it. A working model is included as well as all the data preprocessing and utility classes for minimax and the model. By running app.py, you can work with a fully functioning hosted chess game against my engine, or you can process a new model using my data preprocessing and training functions by finding any pgn and converting it to a csv.
+-   Python-Chess
+
+-   Chess.js
+
+-   Chessboard.js
+
+-   Tensorflow
+
+-   Keras
+
+-   Numpy
+
+-   Pandas
+
+Get Started
+===========
+
+Download the package and unzip it. A working model is included as well as all
+the data preprocessing and utility classes for minimax and the model. By running
+app.py, you can work with a fully functioning hosted chess game against my
+engine, or you can process a new model using my data preprocessing and training
+functions by finding any pgn and converting it to a csv.

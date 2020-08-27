@@ -4,6 +4,6 @@
 68.4% explained variance score
 
 Optimal Model:
-above with weight decay
-660 MAE
-71.7% explained variance
+above with weight decay and new data
+429.06 MAE
+75.0% explained variance

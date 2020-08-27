@@ -21,6 +21,11 @@ print("WAS POPPIN")
 # import preprocessed data
 # tf.debugging.set_log_device_placement(True)
 df = pd.read_csv("./util/compiled_standard_june_2020.csv")
+df2 = pd.read_csv("./util/compiled_2020_0.csv")
+df3 = pd.read_csv("./util/compiled_2020_1_0.csv")
+df3 = df3.drop("Unnamed: 0", axis=1)
+df = df.append(df2)
+df = df.append(df3)
 print(len(df))
 print("HELLLLLLLLLLLLOOOOOOOOOOOOOOOOO")
 bithash = {
@@ -67,7 +72,7 @@ from tensorflow.keras.initializers import GlorotUniform
 from tensorflow_addons.optimizers import AdamW
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose = 1, patience = 20)
+early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose = 1, patience = 15)
 adamOpti = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False,
     name='Adam')
 decayedAdamOpti = AdamW(weight_decay = 0.00001, learning_rate = 0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False, name='AdamW')
@@ -79,7 +84,7 @@ rmsOpti = tf.keras.optimizers.RMSprop(
     name='RMSprop'
 )
 initializer = GlorotUniform()
-regularizerl2 = L2(l2 = 0.01)
+regularizerl2 = L2(l2 = 0.1)
 EPOCHS = 3000
 
 from tensorflow.keras.models import Sequential
@@ -87,11 +92,17 @@ from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2
 model = Sequential()
 #, kernel_regularizer=regularizerl2
 model.add(Conv2D(64, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
+model.add(BatchNormalization())
 model.add(Conv2D(64, (3, 3), activation='relu', padding='same', data_format="channels_last", kernel_regularizer=regularizerl2))
+model.add(BatchNormalization())
 model.add(Conv2D(64, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
 model.add(BatchNormalization())
-model.add(MaxPooling2D((2,2)))
-model.add(Dropout(0.2))
+model.add(Conv2D(64, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
+model.add(BatchNormalization())
+model.add(Conv2D(64, (3, 3), activation='relu', input_shape=(8,8,6), padding='same', kernel_regularizer=regularizerl2))
+model.add(BatchNormalization())
+# model.add(MaxPooling2D((2,2)))
+# model.add(Dropout(0.2))
 
 
 model.add(Flatten())
@@ -110,6 +121,7 @@ model.fit(X_train, y_train, epochs = EPOCHS, validation_data = (X_test, y_test),
 # evaluating
 from sklearn.metrics import mean_absolute_error, explained_variance_score
 pred = model.predict(X_test)
+print("Validation Scores")
 print(mean_absolute_error(y_test, pred))
 print(explained_variance_score(y_test, pred))
 # to see logs

@@ -1,0 +1,12 @@
+import pandas as pd 
+df = pd.read_csv("util/compiled_2020_mates.csv")
+df = df.drop("Unnamed: 0", axis=1)
+df = df.drop("Unnamed: 0.1", axis=1)
+df = df.drop("board", axis=1)
+df2 = pd.read_csv("util/compiled_2020_mates_2.csv")
+df2 = df2.drop("Unnamed: 0", axis=1)
+df2 = df2.drop("board", axis=1)
+df = df.append(df2)
+print(len(df))
+print(df.head())
+df.to_csv("compiled_2020.csv", index=False)
