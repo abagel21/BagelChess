@@ -8,13 +8,14 @@ select the most advantageous move from any given position.
 Planned Development
 -------------------
 
-Short Term : - Improve model structure and hyperparameters - Optimize current
-move selection strategy
+Short Term : 
+- Improve model structure and hyperparameters 
+- Optimize current move selection strategy
 
-Long Term : - Train a larger dataset - Improve move selection with optimization
-of the move tree, or with Monte Carlo Tree Search - Build my own bitboard game
-representation and move generator - Convert to self play rather than existing
-data
+Long Term : 
+- Train a larger dataset - Improve move selection with optimization of the move tree, or with Monte Carlo Tree Search 
+- Build my own bitboard game representation and move generator 
+- Convert to self play rather than existing data
 
 Construction
 ------------
