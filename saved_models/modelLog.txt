@@ -1,9 +1,6 @@
-3 CNN 2 Dense:
-3 Layer CNN with two dense layers
-688 MAE
-68.4% explained variance score
-
 Optimal Model:
-above with weight decay and new data
-429.06 MAE
-75.0% explained variance
+5 Convolutional Layers with 64 Nodes each and a 3x3 filter
+2 densely connected layers with 64 nodes
+Adam optimizer with .001 learning rate and .00001 weight decay
+368.29 MAE
+80.3% explained variance

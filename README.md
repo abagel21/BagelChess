@@ -69,6 +69,7 @@ My second-to-last model was far, far better than my original, producing the foll
 
 I concluded that the best way to move forward, considering I was once again facing overfitting, was to collect and even larger dataset. I pulled 621,000 games from the FICS game database and split it into 12 pieces, and processed 1.5 of them (prevented from processing more by time and moving). Each portion was ~3.4 million positions, making my final data set 9.4 million samples. With this, and a further tweaked and updated model, I achieved the following loss graph:
 ![9.4 Million Sample Optimal](./model_graphs/9.4_optimal.png)
+This model achieves an 80.3% explained variance score, a huge stride from earlier sub-50% scores.
 
 Although move selection was slow, making games slow, I played several games against the engine. Although I'm not great at chess, I would estimate myself to be 1200-1500 ELO when given sufficient depth (>3). It clearly improves with greater depth (at the cost of move time). Its greatest vulnerabilities are its inability to see particularly far in the future (complex trades, multi-step checkmates against it) and the margin for error allowing unecessary hanging pawns. However, it is particularly good at targeting high value pieces like rooks and queens, and especially good at endgame checks and checkmates (although not pawn endgames).
 
