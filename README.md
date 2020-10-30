@@ -102,4 +102,5 @@ Download the package and unzip it. A working model is included as well as all
 the data preprocessing and utility classes for minimax and the model. By running
 app.py, you can work with a fully functioning hosted chess game against my
 engine, or you can process a new model using my data preprocessing and training
-functions by finding any pgn and converting it to a csv.
+functions by finding any pgn and converting it to a csv. There are several duplicate
+files, but the important ones are CNN.py, app.py, and dataPreprocessing.py.
