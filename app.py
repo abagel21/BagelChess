@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_cors import CORS
+from flask import send_from_directory
 import os
 import chess
 import chess.pgn
@@ -29,8 +30,8 @@ def home():
     global board
     board = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     print(board.copy().piece_map)
-    # return render_template('index.html')
-    return "HELLO"
+    return render_template('index.html')
+    # return "HELLO"
 
 @app.route('/move/<string:source>/<string:target>/<string:color>') 
 def move(source, target, color):
@@ -44,5 +45,10 @@ def move(source, target, color):
     board.push(move)
     return movestring
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
