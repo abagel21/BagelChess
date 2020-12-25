@@ -29,7 +29,8 @@ def home():
     global board
     board = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     print(board.copy().piece_map)
-    return render_template('index.html')
+    # return render_template('index.html')
+    return "HELLO"
 
 @app.route('/move/<string:source>/<string:target>/<string:color>') 
 def move(source, target, color):
