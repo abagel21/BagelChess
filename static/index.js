@@ -3,6 +3,7 @@
 
 var board = null
 var game = new Chess()
+var move = "";
 $('#startPositionBtn').on('click', () => {
     console.log("BUTTON CLICKED");
     board.start;
@@ -19,11 +20,14 @@ function onDragStart(source, piece, position, orientation) {
     if (piece.search(/^b/) !== -1) return false
 }
 
-async function fetchComputerMove() {
-    let fen = game.fen()
-    fen = fen.replace(/\//g, "H")
-    fen = encodeURIComponent(fen)
-    url = `http://127.0.0.1:5000/move/${fen}/${game.turn()}`
+async function fetchComputerMove(source, target) {
+    // let fen = game.fen()
+    // fen = fen.replace(/\//g, "H")
+    // fen = encodeURIComponent(fen)
+    console.log(game.turn());
+    console.log(game.fen())
+    url = `http://127.0.0.1:5000/move/${source}/${target}/${game.turn()}`;
+    console.log(url);
     res = await fetch(url).then(res => {
         return res.text()
     })
@@ -42,11 +46,12 @@ function onDrop(source, target) {
         promotion: 'q' // NOTE: always promote to a queen for example simplicity
     })
 
-    // illegal move
-    if (move === null) return 'snapback'
+    console.log(source + " " + target);
 
-    // make random legal move for black
-    window.setTimeout(fetchComputerMove, 500)
+    // illegal move
+    if (move === null) return 'snapback';
+
+    window.setTimeout(() => { fetchComputerMove(source, target) }, 500)
 }
 
 async function selfPlay() {

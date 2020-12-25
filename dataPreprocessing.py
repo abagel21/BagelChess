@@ -10,7 +10,7 @@ print(engine.ping)
 print("START OF DOCUMENT")
 
 # read the pgn of game data
-df = pd.read_csv('../chessEngine/util/pgn_split_1.csv')
+df = pd.read_csv('../chessEngine/util/partially_processed_standard_2020/pgn_split/pgn_split_2.csv')
 df = df[int(len(df)/2):]
 myTemp = pd.DataFrame()
 
@@ -179,7 +179,7 @@ df = df.append(parallelize_on_rows(df['board'], expandGame), ignore_index = True
 print("FINISHED PARALLELIZING")
 print(len(df))
 # df['board'] = df['board'].apply(lambda x : reverseTurn(x))
-df.drop("board", axis=1).to_csv("expanded_2020_1_2.csv", index=False)
+df.drop("board", axis=1).to_csv("expanded_2020_2_1.csv", index=False)
 # extract board pd.Series
 # y = df['board']
 # x = len(y)

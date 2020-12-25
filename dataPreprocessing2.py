@@ -10,7 +10,7 @@ print(engine.ping)
 print("START OF DOCUMENT")
 
 # read the pgn of game data
-df = pd.read_csv('../chessEngine/expanded_2020_1_1.csv')
+df = pd.read_csv('../chessEngine/util/partially_processed_standard_2020/expanded/expanded_2020_2_2.csv')
 myTemp = pd.DataFrame()
 
 # get the board from the PGN representation
@@ -163,9 +163,9 @@ df['stockfish_eval'] = parallelize_on_rows(y, evalBoard)
 # replace checkmating values
 if(df['stockfish_eval'][0] is not None) :
     print(df.head(5))
-    df.drop("board", axis=1).to_csv("compiled_2020_mates_1.csv", index=False)
+    df.drop("board", axis=1).to_csv("compiled_2020_mates_2_1.csv", index=False)
     df['stockfish_eval'] = df['stockfish_eval'].apply(lambda x : replaceForcedMate(x))
     # remove the boards
     df = df.drop("board", axis=1)
     #   save the dataframe as a csv
-    df.to_csv("compiled_2020_1_0.csv", index=False)
+    df.to_csv("compiled_2020_2_1.csv", index=False)

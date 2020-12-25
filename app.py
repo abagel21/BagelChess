@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask_cors import CORS
 import os
 import chess
+import chess.pgn
 import re
 from tensorflow.keras.models import load_model
 from treesearch import minimaxRoot
@@ -20,27 +21,27 @@ PORT = 80
 
 app = Flask(__name__)
 CORS(app)
+board = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
 @app.route('/')
 def home():
     # serve static
+    global board
+    board = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+    print(board.copy().piece_map)
     return render_template('index.html')
 
-@app.route('/move/<string:fen>/<string:color>') 
-def move(fen, color):
-    print("Endpoint hit")
-    fen = urllib.parse.unquote(fen)
-    fen = re.sub(r'H', '/', fen)
-    print(fen)
-    color = True if color == 'w' else False
+@app.route('/move/<string:source>/<string:target>/<string:color>') 
+def move(source, target, color):
+    color = False if color == 'w' else True
     # need color of engine and FEN of current board
-    board = chess.Board(fen)
     board.turn = color
-    node = Node(board, model, color, False)
-    move = minimaxRoot(node, 0, DEPTH, False, model, not color)
-    print(board.san(move))
-    move = board.san(move)
-    return move
+    prevMove = chess.Move(chess.SQUARE_NAMES.index(source), chess.SQUARE_NAMES.index(target))
+    board.push(prevMove)
+    move = minimaxRoot(board, 0, DEPTH, False, model, not color)
+    movestring = board.san(move)
+    board.push(move)
+    return movestring
 
 if __name__ == "__main__":
     app.run(debug=True)
