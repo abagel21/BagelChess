@@ -2,3 +2,4 @@ node_modules/
 extras/
 util/
 .ipynb_checkpoints/
+*.csv
