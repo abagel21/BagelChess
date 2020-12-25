@@ -13,16 +13,21 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 tf.keras.optimizers.AdamW = tfa.optimizers.AdamW
 
-DEPTH = 3
+DEPTH = 4
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 if len(physical_devices) > 0:
    tf.config.experimental.set_memory_growth(physical_devices[0], True)
 model = load_model('./saved_models/optimal')
+converter = tf.lite.TFLiteConverter.from_saved_model("./saved_models/optimal")
+model = converter.convert()
+model = tf.lite.Interpreter(model_content=model)
+model.allocate_tensors()
 PORT = 80
 
 app = Flask(__name__)
 CORS(app)
 board = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+print(str(minimaxRoot(board, 0, 2, False, model, True)))
 
 @app.route('/')
 def home():
@@ -37,10 +42,13 @@ def home():
 def move(source, target, color):
     color = False if color == 'w' else True
     # need color of engine and FEN of current board
+    # if(board.is_checkmate):
+    #     return "CHECKMATE"
     board.turn = color
     prevMove = chess.Move(chess.SQUARE_NAMES.index(source), chess.SQUARE_NAMES.index(target))
     board.push(prevMove)
-    move = minimaxRoot(board, 0, DEPTH, False, model, not color)
+    for i in range(1, DEPTH + 1):
+        move = minimaxRoot(board, 0, i, False, model, not color)
     movestring = board.san(move)
     board.push(move)
     return movestring

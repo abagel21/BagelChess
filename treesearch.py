@@ -22,6 +22,8 @@ bithash = {
     "P" : np.array([-1,0,0,0,0,0]),
 }
 engineModel = {}
+input_details = {}
+output_details = {}
 globalBoard = {}
 
 # dict for repeat game states
@@ -90,9 +92,14 @@ def compareBoards(item1, item2) :
     state2 = predictFromMove(item2, globalBoard)
     return state1 - state2
 
+
+A1, H1, A8, H8 = 56, 63, 0, 7
+
 def predictFromMove(move, board):
     # TODO continue refining evaluation function based on move
     baseboard = board.copy()
+    if board.__str__() in state_dict: 
+        return state_dict[board.__str__()]
     i = move.from_square
     j = move.to_square
     c = board.turn
@@ -103,11 +110,16 @@ def predictFromMove(move, board):
         # i = 64 - i
         # j = 64 - j
     res = 0
-    # add the value of the change in position
-    res += pst[baseboard.piece_type_at(i)][j] - pst[baseboard.piece_type_at(i)][i]
+    p = baseboard.piece_type_at(i)
+    # add the value of the new position of the piece - the value of the old position of the piece
+    res += pst[p][j] - pst[p][i]
     # add the value of the capture if there was a capture
     if(baseboard.piece_type_at(j) is not None and not baseboard.color_at(j)):
-        res += pst[baseboard.piece_type_at(j)][64 - j]
+        res += pst[baseboard.piece_type_at(j)][63 - j]
+    # pawn promotion
+    if p == 1:
+            if A8 <= j <= H8:
+                res += pst[5][j] - pst[0][j]
     return res
 
 def predictFromBoardTable(board):
@@ -124,7 +136,13 @@ def predictFromBoardTable(board):
     return res
 
 def predictFromBoard(board) :
+        global leafCount
+        global input_details
+        global output_details
         global engineModel
+        if board.__str__() in state_dict: 
+            leafCount = leafCount - 1
+            return state_dict[board.__str__()]
         # don't rely on engine for checkmates
         # if(board.is_checkmate) :
         #     if(board.turn): return -10000
@@ -136,10 +154,14 @@ def predictFromBoard(board) :
         # print("Reshaping took " + str(end - start))
         # predict the value of the board state with the CNN
         # start = time.time()
-        prediction = engineModel(x).numpy()[0][0]
+        engineModel.set_tensor(input_details[0]['index'], x.astype(np.float32))
+        engineModel.invoke()
+        output_data = engineModel.get_tensor(output_details[0]['index'])
+        results = np.squeeze(output_data)
+        # print(str(results))
         # end = time.time()
         # print("Predicting took " + str(end - start))
-        return prediction
+        return results
 
 def boardToNPArray(x):
     x=x.__str__()
@@ -161,11 +183,17 @@ leafCount = 0
 def minimaxRoot(board, depth, maxdepth, ismax, model, color) :
     global engineModel
     global globalBoard
+    global input_details
+    global output_details
     globalBoard = board
     engineModel = model
+    input_details = engineModel.get_input_details()
+    output_details = engineModel.get_output_details()
     bestMoveVal = 10000
     bestMove = None
     global leafCount
+    global state_dict
+    print(len(state_dict))
     leafCount = 0
     # build node for each possible move from starting state
     # (which also evaluates the move with the convolutional neural network)
@@ -199,7 +227,10 @@ def minimax (board, depth, maxdepth, ismax, alpha, beta, model, color):
     if (depth >= maxdepth or board.is_game_over()):
         global leafCount
         leafCount = leafCount + 1
-        return predictFromBoard(board)
+        prediction = predictFromBoard(board)
+        if not board.__str__() in state_dict: 
+            state_dict[board.__str__()] = prediction
+        return prediction
     # use recursion to travel to leaf or depth of tree
     # backpropogate max values to root
     # maximize or minimize depending on depth
