@@ -7,7 +7,7 @@ select the most advantageous move from any given position.
 
 Demo
 -------------------
-The project is currently hosted in a limited fashion at <a href="http://bagelchess.com">axotl.com</a>.
+The project is currently hosted in a limited fashion at <a href="http://bagelchess.com">bagelchess.com</a>.
 
 Planned Development
 -------------------
