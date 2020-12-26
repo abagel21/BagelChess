@@ -5,6 +5,10 @@ BagelChess is a deep learning chess engine. Utilizing a combination of minimax
 with alpha beta pruning and a convolutional neural network, the engine seeks to
 select the most advantageous move from any given position.
 
+Demo
+-------------------
+The project is currently hosted in a limited fashion at <a href="http://bagelchess.com">axotl.com</a>.
+
 Planned Development
 -------------------
 
@@ -72,6 +76,8 @@ I concluded that the best way to move forward, considering I was once again faci
 This model achieves an 80.3% explained variance score, a huge stride from earlier sub-50% scores.
 
 Although move selection was slow, making games slow, I played several games against the engine. Although I'm not great at chess, I would estimate myself to be 1200-1500 ELO when given sufficient depth (>3). It clearly improves with greater depth (at the cost of move time). Its greatest vulnerabilities are its inability to see particularly far in the future (complex trades, multi-step checkmates against it) and the margin for error allowing unecessary hanging pawns. However, it is particularly good at targeting high value pieces like rooks and queens, and especially good at endgame checks and checkmates (although not pawn endgames).
+
+In order to improve move selection, I optimized the implicit move generation to only use a single board, and added a transposition table in addition to iterative deepening and move ordering via lazy evaluation with piece-square tables to roughly sort the next moves to evaluate from a position and improve alpha beta pruning.
 
 I also constructed a website for the engine where it can be played against
 utilizing flask and two chess libraries--one for the board, one for the

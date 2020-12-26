@@ -2,13 +2,25 @@
 // https://github.com/jhlywa/chess.js
 
 var board = null
+var $board = $('#myBoard')
+var $done = $('.done')
+var squareClass = 'square-55d63'
+var squareToHighlight = null
+var colorToHighlight = null
 var game = new Chess()
 var move = "";
-$('#startPositionBtn').on('click', () => {
+$('#startPositionBtn').on('click', async() => {
     console.log("BUTTON CLICKED");
     board.start;
+    // url = `https://bagelchess.herokuapp.com/reset`;
+    url = `http://127.0.0.1:5000/reset`
+    res = await fetch(url).then(res => {
+        return res.text()
+    })
     game.reset();
+    board = Chessboard('myBoard', config)
 })
+$("#status").text("Make a move to begin!");
 
 $('#selfBtn').on('click', selfPlay())
 
@@ -26,12 +38,20 @@ async function fetchComputerMove(source, target) {
     // fen = encodeURIComponent(fen)
     console.log(game.turn());
     console.log(game.fen())
+        // url = `https://bagelchess.herokuapp.com/move/${source}/${target}/${game.turn()}`;
     url = `http://127.0.0.1:5000/move/${source}/${target}/${game.turn()}`;
     console.log(url);
+    $done.addClass("thinking")
     res = await fetch(url).then(res => {
         return res.text()
     })
     game.move(res)
+    $done.removeClass("thinking")
+    var nextMove = game.history({ verbose: true })[game.history().length - 1]
+    $board.find('.' + squareClass).removeClass('highlight-black')
+    $board.find('.square-' + nextMove.from).addClass('highlight-black')
+    squareToHighlight = nextMove.to
+    colorToHighlight = 'black'
     board.position(game.fen())
 }
 
@@ -75,11 +95,19 @@ function onSnapEnd() {
     board.position(game.fen())
 }
 
+function onMoveEnd() {
+    console.log(squareToHighlight + ", " + colorToHighlight);
+    $board.find('.square-' + squareToHighlight)
+        .addClass('highlight-' + colorToHighlight)
+    $("#status").text(game.history()[game.history().length - 1]);
+}
+
 var config = {
     draggable: true,
     position: 'start',
     onDragStart: onDragStart,
     onDrop: onDrop,
-    onSnapEnd: onSnapEnd
+    onSnapEnd: onSnapEnd,
+    onMoveEnd: onMoveEnd
 }
 board = Chessboard('myBoard', config)
