@@ -1,19 +1,39 @@
 // NOTE: this example uses the chess.js library:
 // https://github.com/jhlywa/chess.js
 
-var board = null
-var $board = $('#myBoard')
-var $done = $('.done')
-var squareClass = 'square-55d63'
-var squareToHighlight = null
-var colorToHighlight = null
-var game = new Chess()
+var board = null;
+var $board = $('#myBoard');
+var $done = $('.done');
+var $modal = $('.gameEnd');
+var $close = $('.close');
+var $message = $('.message');
+var $descript = $('.descript')
+var squareClass = 'square-55d63';
+var squareToHighlight = null;
+var colorToHighlight = null;
+var game = new Chess();
 var move = "";
+
+$close.on('click', (e) => {
+    e.stopPropagation();
+    $modal.removeClass('selected')
+})
+
+$modal.unbind().on('click', (e) => {
+    console.log("propogated")
+    $modal.removeClass('selected');
+})
+
+$message.on('click', (e) => {
+    console.log("message clicked")
+    e.stopPropagation();
+})
+
 $('#startPositionBtn').on('click', async() => {
     console.log("BUTTON CLICKED");
     board.start;
-    // url = `https://bagelchess.herokuapp.com/reset`;
-    url = `http://127.0.0.1:5000/reset`
+    url = `http://bagelchess.com/reset`;
+    // url = `http://127.0.0.1:5000/reset`
     res = await fetch(url).then(res => {
         return res.text()
     })
@@ -38,14 +58,30 @@ async function fetchComputerMove(source, target) {
     // fen = encodeURIComponent(fen)
     console.log(game.turn());
     console.log(game.fen())
-        // url = `https://bagelchess.herokuapp.com/move/${source}/${target}/${game.turn()}`;
-    url = `http://127.0.0.1:5000/move/${source}/${target}/${game.turn()}`;
+    if (game.history({ verbose: true })[game.history().length - 1].promotion) {
+        promotion = 't'
+    } else {
+        promotion = 'f'
+    }
+    // url = `http://www.bagelchess.com/move/${source}/${target}/${game.turn()}/${promotion}`;
+    url = `http://127.0.0.1:5000/move/${source}/${target}/${game.turn()}/${promotion}`;
     console.log(url);
     $done.addClass("thinking")
     res = await fetch(url).then(res => {
         return res.text()
     })
+    console.log(res)
     game.move(res)
+    if (game.game_over()) {
+        $modal.addClass('selected');
+        if (game.in_draw()) {
+            $descript.html("Draw")
+        } else if (game.in_checkmate()) {
+            $descript.html("Computer won")
+        } else {
+            $descript.html("Stalemate")
+        }
+    }
     $done.removeClass("thinking")
     var nextMove = game.history({ verbose: true })[game.history().length - 1]
     $board.find('.' + squareClass).removeClass('highlight-black')
@@ -56,9 +92,6 @@ async function fetchComputerMove(source, target) {
 }
 
 function onDrop(source, target) {
-    if (game.game_over()) {
-        alert("Game Over!")
-    }
     // see if the move is legal
     var move = game.move({
         from: source,
@@ -71,7 +104,17 @@ function onDrop(source, target) {
     // illegal move
     if (move === null) return 'snapback';
 
-    window.setTimeout(() => { fetchComputerMove(source, target) }, 500)
+    if (!game.game_over()) window.setTimeout(() => { fetchComputerMove(source, target) }, 500)
+    else {
+        $modal.addClass('selected');
+        if (game.in_draw()) {
+            $descript.html("Draw")
+        } else if (game.in_checkmate()) {
+            $descript.html("You won!")
+        } else {
+            $descript.html("Stalemate")
+        }
+    }
 }
 
 async function selfPlay() {
@@ -111,3 +154,4 @@ var config = {
     onMoveEnd: onMoveEnd
 }
 board = Chessboard('myBoard', config)
+$(window).resize(board.resize)

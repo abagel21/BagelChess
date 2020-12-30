@@ -1,17 +1,183 @@
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.loadingAndChess {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.wrapper {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+@media(min-width: 300px) {
+    #myBoard {
+        width: 95%!important;
+    }
+    .loading {
+        width: 100%!important;
+    }
+    .loadingAndChess {
+        margin-top: 15%;
+    }
+}
+
+@media(min-width: 500px) {
+    #myBoard {
+        width: 80%!important;
+    }
+    .loading {
+        width: 75%!important;
+    }
+    .loadingAndChess {
+        margin-top: 5%;
+    }
+}
+
+@media(min-width: 600px) {
+    #myBoard {
+        width: 70%!important;
+    }
+    .loading {
+        width: 50%!important;
+    }
+}
+
+@media(min-width: 800px) {
+    #myBoard {
+        width: 60%!important;
+    }
+    .loading {
+        width: 40%!important;
+    }
+}
+
+@media(min-width: 1200px) {
+    #myBoard {
+        width: 55%!important;
+    }
+    .loading {
+        width: 30%!important;
+    }
+    .loadingAndChess {
+        margin-top: 0;
+    }
+}
+
+@media(min-width: 1500px) {
+    #myBoard {
+        width: 45%!important;
+    }
+}
+
+@media(min-width: 1800px) {
+    #myBoard {
+        width: 45%!important;
+    }
+}
+
+@media(min-width: 2000px) {
+    #myBoard {
+        width: 42.5%!important;
+    }
+    .loading {
+        width: 20%!important;
+    }
+}
+
+@media(min-width: 2300px) {
+    #myBoard {
+        width: 40%!important;
+    }
+    .loading {
+        width: 15%!important;
+    }
+}
+
+@media(min-width: 2600px) {
+    #myBoard {
+        width: 35%!important;
+    }
+    .loading {
+        width: 15%!important;
+    }
+}
+
+@media(min-width: 3000px) {
+    #myBoard {
+        width: 30%!important;
+    }
+    .loading {
+        width: 15%!important;
+    }
+}
+
 #myBoard {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 #startPositionBtn {
     position: absolute;
     left: 50%;
+    top: 0;
     transform: translateX(-50%);
 }
 
 #status {
     position: absolute;
     width: 100px;
+}
+
+.gameEnd {
+    visibility: hidden;
+    opacity: 0;
+    z-index: 69420;
+    position: fixed;
+    height: 100vh;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, .1);
+}
+
+.selected {
+    visibility: visible;
+    opacity: 1;
+}
+
+.message {
+    position: absolute;
+    background-color: white;
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20rem;
+    font-size: 25px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1rem 1rem 1rem rgba(0, 0, 0, .2);
+}
+
+.close {
+    background-color: transparent;
+    border: none;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.over {
+    padding: 1rem;
 }
