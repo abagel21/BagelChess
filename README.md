@@ -7,7 +7,7 @@ select the most advantageous move from any given position.
 
 Demo
 -------------------
-The project is currently hosted in a limited fashion at <a href="http://bagelchess.com">bagelchess.com</a>.
+The project is currently hosted in a limited fashion at <a href="http://bagelchess.com">bagelchess.com</a>. However, this demo is limited in search depth by the cost of cloud computing--the cluster used doesn't have a GPU because it would be prohibitively expensive to run for a significant period of time, and thus has a lower search depth and slower move time than if run on a local system with decent specifications.
 
 Planned Development
 -------------------
