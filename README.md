@@ -1,9 +1,7 @@
 BagelChess
 ==========
 
-BagelChess is a deep learning chess engine. Utilizing a combination of minimax
-with alpha beta pruning and a convolutional neural network, the engine seeks to
-select the most advantageous move from any given position.
+BagelChess is a deep learning chess engine. The current iteration utilizes a deep learning convolutional neural network with five convolutional layers of rectified linear activation functions bolstered with L2 regularization and batch normalization followed by 2 layers of dense rectified linear activation functions and L2 regularization. This neural network is used for board evaluation, while at the moment the MTD(f) algorithm is used to traverse the move selection tree with zero window alpha beta minimax calls bolstered with iterative deepening and a transposition table.
 
 Demo
 -------------------
@@ -106,7 +104,7 @@ Get Started
 
 Download the package and unzip it. A working model is included as well as all
 the data preprocessing and utility classes for minimax and the model. By running
-app.py, you can work with a fully functioning hosted chess game against my
+application.py, you can work with a fully functioning hosted chess game against my
 engine, or you can process a new model using my data preprocessing and training
 functions by finding any pgn and converting it to a csv. There are several duplicate
 files, but the important ones are CNN.py, app.py, and dataPreprocessing.py.
