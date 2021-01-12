@@ -24,31 +24,21 @@ PORT = 80
 
 application = Flask(__name__)
 CORS(application)
-application.config["MONGO_URI"] = "mongodb+srv://bagelchess:3QZ2B8OFKA3oL8kp@cluster0.hgoja.mongodb.net/bagelchess?retryWrites=true&w=majority"
-mongo = PyMongo(application)
-application.config['SESSION_TYPE'] = 'mongodb'
-application.config['SESSION_MONGODB'] = mongo.db
-application.secret_key = 'heheomegalul'
-Session(application)
 board = None
 board = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
 @application.route('/')
 def home():
     print("HOME ROUTE HIT")
-    if 'board' in session:
-        print("BOARD WAS " + str(session.get('board')))
     # serve static
     board = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    session['board'] = board.fen()
     print(board)
-    print(session)
     return render_template('index.html')
 
 @application.route('/move/<string:source>/<string:target>/<string:color>/<string:promotion>') 
 def move(source, target, color, promotion):
-    localboard = session.get('board')
-    localboard = chess.Board(session.get('board'))
+    global board
+    localboard = board
     # print("board here")
     # print(localboard)
     # print(localboard.is_game_over())
