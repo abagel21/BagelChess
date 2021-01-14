@@ -1,7 +1,7 @@
 BagelChess
 ==========
 
-BagelChess is a deep learning chess engine. The current iteration utilizes a deep learning convolutional neural network with five convolutional layers of rectified linear activation functions bolstered with L2 regularization and batch normalization followed by 2 layers of dense rectified linear activation functions and L2 regularization. This neural network is used for board evaluation, while at the moment the MTD(f) algorithm is used to traverse the move selection tree with zero window alpha beta minimax calls bolstered with iterative deepening and a transposition table.
+BagelChess is a deep learning chess engine. I was inspired by the resurgence of chess this summer in the streaming and online community and my own games with my friends to pursue something at the intersection of my interests--coding and chess. The current iteration utilizes a deep learning convolutional neural network with five convolutional layers of rectified linear activation functions bolstered with L2 regularization and batch normalization followed by 2 layers of dense rectified linear activation functions and L2 regularization. This neural network is used for board evaluation, while at the moment the MTD(f) algorithm is used to traverse the move selection tree with zero window alpha beta minimax calls bolstered with iterative deepening and a transposition table.
 
 Demo
 -------------------
